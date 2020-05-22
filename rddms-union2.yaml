@@ -1,0 +1,114 @@
+apiVersion: teiid.io/v1alpha1
+kind: VirtualDatabase
+metadata:
+  creationTimestamp: '2020-04-07T10:40:31Z'
+  generation: 8
+  name: rdbms-union2
+  namespace: dv-demo
+  resourceVersion: '7970698'
+  selfLink: /apis/teiid.io/v1alpha1/namespaces/dv-demo/virtualdatabases/rdbms-union2
+  uid: 34507939-78bc-11ea-83de-52fdfc072182
+spec:
+  build:
+    env:
+      - name: DEPLOYMENTS_DIR
+        value: /deployments
+      - name: MAVEN_ARGS
+        value: >-
+          clean package -DskipTests -Dmaven.javadoc.skip=true
+          -Dmaven.site.skip=true -Dmaven.source.skip=true -Djacoco.skip=true
+          -Dcheckstyle.skip=true -Dfindbugs.skip=true -Dpmd.skip=true
+          -Dfabric8.skip=true -e -B
+      - name: DIGEST
+        value: vssdv0LquY_Z202doEiJwxzfXMhsIh51WcpcMlKb8j1w
+    git: {}
+    incremental: true
+    s2i:
+      imageName: fuse-java-openshift
+      imagePrefix: fuse7
+      registry: registry.redhat.io
+      tag: '1.5'
+    source:
+      ddl: >
+        CREATE DATABASE customer OPTIONS (ANNOTATION 'Customer VDB');  
+
+        USE DATABASE customer;
+
+        CREATE FOREIGN DATA WRAPPER postgresql;  
+
+        CREATE FOREIGN DATA WRAPPER mysql;
+
+        CREATE SERVER sampledb TYPE 'NONE' FOREIGN DATA WRAPPER postgresql
+        OPTIONS ("resource-name" 'sampledb');   
+
+        CREATE SERVER mysqlsampledb TYPE 'NONE' FOREIGN DATA WRAPPER mysql 
+        OPTIONS ("resource-name" 'mysqlsampledb');
+
+        CREATE SCHEMA accounts SERVER sampledb;   
+
+        CREATE SCHEMA haccounts SERVER mysqlsampledb;   
+
+        CREATE VIRTUAL SCHEMA portfolio;
+
+        SET SCHEMA accounts;   
+
+        IMPORT FOREIGN SCHEMA public FROM SERVER sampledb INTO accounts
+        OPTIONS("importer.useFullSchemaName" 'false');   
+
+        SET SCHEMA haccounts;   
+
+        IMPORT FOREIGN SCHEMA public FROM SERVER mysqlsampledb INTO haccounts
+        OPTIONS("importer.useFullSchemaName" 'false');
+
+        SET SCHEMA portfolio; 
+
+        CREATE VIEW CustomerZip(id bigint PRIMARY KEY, name string, ssn string,
+        zip string) AS SELECT ID as id, NAME as name, SSN as ssn, ZIP as zip
+        FROM accounts.CUSTOMERZIP UNION SELECT ID as id, NAME as name, SSN as
+        ssn, ZIP as zip from haccounts.CUSTOMERZIP;
+      mavenRepositories:
+        central: 'https://repo.maven.apache.org/maven2'
+        repo-02-redhat-ga: 'https://maven.repository.redhat.com/ga/'
+        repo-03-jboss-ga: 'https://repository.jboss.org/'
+  env:
+    - name: SPRING_DATASOURCE_SAMPLEDB_USERNAME
+      value: user
+    - name: SPRING_DATASOURCE_SAMPLEDB_PASSWORD
+      value: mypassword
+    - name: SPRING_DATASOURCE_SAMPLEDB_DATABASENAME
+      value: sampledb
+    - name: SPRING_DATASOURCE_SAMPLEDB_JDBCURL
+      value: 'jdbc:postgresql://postgresql/$(SPRING_DATASOURCE_SAMPLEDB_DATABASENAME)'
+    - name: SPRING_DATASOURCE_MYSQLSAMPLEDB_USERNAME
+      value: user
+    - name: SPRING_DATASOURCE_MYSQLSAMPLEDB_PASSWORD
+      value: mypassword
+    - name: SPRING_DATASOURCE_MYSQLSAMPLEDB_DATABASENAME
+      value: mysqlsampledb
+    - name: SPRING_DATASOURCE_MYSQLSAMPLEDB_JDBCURL
+      value: >-
+        jdbc:mysql://mysql:3306/$(SPRING_DATASOURCE_MYSQLSAMPLEDB_DATABASENAME)?verifyServerCertificate=false&useSSL=false
+    - name: JAVA_APP_DIR
+      value: /deployments
+    - name: JAVA_OPTIONS
+      value: >-
+        -Djava.net.preferIPv4Stack=true -Duser.home=/tmp
+        -Djava.net.preferIPv4Addresses=true
+    - name: JAVA_DEBUG
+      value: 'false'
+    - name: AB_JMX_EXPORTER_CONFIG
+      value: /tmp/src/src/main/resources/prometheus-config.yml
+    - name: NAMESPACE
+      valueFrom:
+        fieldRef:
+          apiVersion: v1
+          fieldPath: metadata.namespace
+  replicas: 1
+  resources: {}
+  runtime:
+    type: SpringBoot
+    version: 1.2.1.fuse-750013-redhat-00001
+status:
+  digest: vssdv0LquY_Z202doEiJwxzfXMhsIh51WcpcMlKb8j1w
+  phase: Running
+  route: 'https://rdbms-union2-dv-demo.apps-crc.testing/odata'
