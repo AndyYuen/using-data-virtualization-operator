@@ -5,3 +5,5 @@
     - name: SPRING_DATASOURCE_MYSQLSAMPLEDB_DATABASENAME
       value: mysqlsampledb
     - name: SPRING_DATASOURCE_MYSQLSAMPLEDB_JDBCURL
+      value: >-
+        jdbc:mysql://mysql:3306/$(SPRING_DATASOURCE_MYSQLSAMPLEDB_DATABASENAME)?verifyServerCertificate=false&useSSL=false
