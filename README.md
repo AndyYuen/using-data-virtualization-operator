@@ -65,7 +65,12 @@ Here is a screenshot of the results from the 2nd URL above.
 ![ODATA Interaction](images/odataInteraction.png "ODATA Interaction")
 
 ### 3.2 Using JDBC
-I am using SquirrelSQL CLient to interact with the VDB. Before you can connect to the VDB using JDBC, you need to login to Openshift, change to the project where the VDB resides and execute the following command from the command line:
+I am using the Squirrel SQL client in my demo. You may use other SQL clients of your choosing. If you should want to use Squirrel SQL client, here is the link to the official site: http://squirrel-sql.sourceforge.net
+
+From the Squirrel SQL Client, install the Teiid JDBC driver and set up an alias and set the URL to: jdbc:teiid:customer@mm://127.0.0.1:31000 
+There is no need to set the User and Password.
+
+Before you can connect to the VDB using JDBC, you need to login to Openshift, change to the project where the VDB resides and execute the following command from the command line:
 
 <pre>
 oc port-forward $(oc get pods -o=jsonpath='{.items[0].metadata.name}' -l app=rdbms-union2) 35432 31000
@@ -79,5 +84,5 @@ You can expand the portfolio structure and select "content" to see the data in t
 
 ![Show Singe View](images/showCombinedData.png "Show Singe View")
 
-## Conclusions
+## 4 Conclusions
 I've showed you how to create a VDB using the Data Virtualization Operator. You can try it out and crate a VDB of your own. In the next instalment, I shall show you how to create a VDB using Spring Boot and manage the security using Keycloak.
