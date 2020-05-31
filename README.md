@@ -67,7 +67,7 @@ Here is a screenshot of the results from the 2nd URL above.
 ### 3.2 Using JDBC
 I am using the Squirrel SQL client in my demo. You may use other SQL clients of your choosing. If you should want to use Squirrel SQL client, here is the link to the official site: http://squirrel-sql.sourceforge.net
 
-From the Squirrel SQL Client, install the Teiid JDBC driver and set up an alias and set the URL to: jdbc:teiid:customer@mm://127.0.0.1:31000 
+From the Squirrel SQL Client, install the Teiid JDBC driver with Class Name: **org.teiid.jdbc.TeiidDriver** and set up an alias and point the URL to: jdbc:teiid:customer@mm://127.0.0.1:31000 
 There is no need to set the User and Password.
 
 Before you can connect to the VDB using JDBC, you need to login to Openshift, change to the project where the VDB resides and execute the following command from the command line:
